@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #FDFAFF;
+  color: #2d1b69;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-script {
+  font-family: 'Dancing Script', cursive;
+}
+
+.font-heading {
+  font-family: 'Playfair Display', serif;
+}
+
+.gradient-bar {
+  background: linear-gradient(to right, #9B7FD4, #C4A8E8, #EC4899);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #9B7FD4, #EC4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #9B7FD4, #EC4899);
+  color: white;
+  padding: 14px 40px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(155, 127, 212, 0.45);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #9B7FD4;
+  padding: 12px 36px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 2px solid #9B7FD4;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #9B7FD4, #EC4899);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px);
+}
+
+.section-label {
+  font-family: 'Dancing Script', cursive;
+  color: #9B7FD4;
+  font-size: 22px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.divider-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px auto 28px;
+  color: #C4A8E8;
+}
+
+.divider-ornament::before,
+.divider-ornament::after {
+  content: '';
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #C4A8E8);
+}
+
+.divider-ornament::after {
+  background: linear-gradient(to left, transparent, #C4A8E8);
+}
+
+.star {
+  color: #f59e0b;
+}
