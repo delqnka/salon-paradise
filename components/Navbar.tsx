@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import theme from "@/theme.config";
 
@@ -14,14 +14,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <>
@@ -30,16 +23,14 @@ export default function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed top-1 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-md py-3" : "bg-transparent py-4"
-        }`}
+        className="fixed top-1 left-0 right-0 z-40 bg-white shadow-md py-1.5 md:py-3"
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between">
           <a href="#home" className="flex items-center">
             <img
               src="/logo-2.png"
               alt="Koketna Beauty Place"
-              className="h-20 w-auto object-contain drop-shadow-lg"
+              className="h-12 md:h-20 w-auto object-contain [filter:drop-shadow(0_2px_3px_rgba(168,85,247,0.45))_drop-shadow(0_4px_10px_rgba(236,72,153,0.35))_drop-shadow(0_1px_0_rgba(255,255,255,0.9))]"
             />
           </a>
 
@@ -48,9 +39,7 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className={`text-[13px] font-medium tracking-wide transition-colors uppercase ${
-                  scrolled ? "text-gray-600 hover:text-purple-600" : "text-white/80 hover:text-white"
-                }`}
+                className="text-[13px] font-medium tracking-wide transition-colors uppercase text-gray-600 hover:text-purple-600"
               >
                 {link.label}
               </a>

@@ -11,7 +11,7 @@ const services = [
     sale: null,
     originalPrice: null,
     category: "Мигли",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80",
+    image: "/ламин.jpg",
   },
   {
     name: "Комбо пакет Почистване на лице и хидратираща терапия",

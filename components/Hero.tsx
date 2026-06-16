@@ -34,19 +34,6 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto px-6 w-full pt-28 pb-20">
         <div className="max-w-2xl">
 
-          {/* Горен лейбъл */}
-          <motion.div
-            initial={{ opacity: 1, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 mb-8"
-          >
-            <div className="h-px w-10 bg-pink-400" />
-            <span className="text-pink-300 text-xs tracking-[4px] uppercase font-light">
-              Варна, България
-            </span>
-          </motion.div>
-
           {/* Главен надпис */}
           <motion.h1
             initial={{ opacity: 1, y: 30 }}
@@ -108,42 +95,53 @@ export default function Hero() {
             <a href="#booking" className="btn-primary text-sm">
               Запишете час
             </a>
-            <a
-              href="#services"
-              className="text-white border border-white/30 px-9 py-3.5 rounded-full text-xs font-semibold tracking-[2px] uppercase hover:bg-white/10 transition-all"
-            >
+            <a href="#services" className="btn-gradient-border">
               Нашите услуги
             </a>
           </motion.div>
 
           {/* Статистики */}
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex gap-10 mt-14 pt-10 border-t border-white/10"
-          >
+          <div className="flex gap-6 sm:gap-10 mt-14 pt-10 border-t border-white/20">
             {[
               { num: "58+", label: "Доволни клиенти" },
               { num: "4.8★", label: "Google рейтинг" },
               { num: "5+", label: "Години опит" },
-            ].map((stat) => (
-              <div key={stat.label}>
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.7 + i * 0.15,
+                  type: "spring",
+                  stiffness: 120,
+                }}
+                whileHover={{ y: -4, scale: 1.08 }}
+                className="flex-1"
+              >
                 <div
-                  className="text-2xl font-bold mb-1"
+                  className="text-3xl sm:text-4xl font-extrabold mb-1.5"
                   style={{
-                    background: "linear-gradient(135deg, #C4A8E8, #EC4899)",
+                    background: "linear-gradient(180deg, #FFFFFF 0%, #FDE68A 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
+                    filter:
+                      "drop-shadow(0 2px 4px rgba(0,0,0,0.55)) drop-shadow(0 0 12px rgba(236,72,153,0.45))",
                   }}
                 >
                   {stat.num}
                 </div>
-                <div className="text-white/50 text-xs tracking-wide">{stat.label}</div>
-              </div>
+                <div
+                  className="text-white text-[10px] sm:text-xs tracking-wider font-semibold uppercase"
+                  style={{ textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}
+                >
+                  {stat.label}
+                </div>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -152,7 +150,7 @@ export default function Hero() {
         initial={{ opacity: 1, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="absolute bottom-10 right-6 bg-white/10 backdrop-blur-md rounded-2xl p-4 flex items-center gap-3 border border-white/20"
+        className="hidden md:flex absolute top-28 right-6 bg-white/10 backdrop-blur-md rounded-2xl p-4 items-center gap-3 border border-white/20"
       >
         <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink-300">
           <img
@@ -168,16 +166,6 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      {/* Scroll индикатор */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-1"
-        >
-          <div className="w-1.5 h-1.5 bg-white/60 rounded-full" />
-        </motion.div>
-      </div>
     </section>
   );
 }

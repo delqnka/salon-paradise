@@ -10,6 +10,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -17,6 +19,12 @@ body {
   background-color: #FDFAFF;
   color: #2d1b69;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
 }
 
 .font-script {
@@ -116,4 +124,72 @@ body {
 
 .star {
   color: #f59e0b;
+}
+
+@property --grad-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.btn-gradient-border {
+  position: relative;
+  display: inline-block;
+  padding: 14px 36px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  background: transparent;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: transform 0.3s ease;
+}
+
+.btn-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--grad-angle),
+    #9B7FD4,
+    #C4A8E8,
+    #EC4899,
+    #F472B6,
+    #9B7FD4
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: spin-gradient 4s linear infinite;
+  pointer-events: none;
+}
+
+.btn-gradient-border:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes spin-gradient {
+  to { --grad-angle: 360deg; }
+}
+
+@keyframes call-ping {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  80%  { transform: scale(1.8); opacity: 0;   }
+  100% { transform: scale(1.8); opacity: 0;   }
+}
+
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+  .btn-gradient-border::before {
+    background: linear-gradient(135deg, #9B7FD4, #EC4899);
+    animation: none;
+  }
 }

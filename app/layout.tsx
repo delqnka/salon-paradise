@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,6 +11,17 @@ export const metadata: Metadata = {
     description: "Специализирани терапии за красота и подмладяване на кожата във Варна.",
     type: "website",
   },
+  formatDetection: {
+    telephone: true,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#9B7FD4",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

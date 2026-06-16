@@ -35,7 +35,7 @@ export default function BookingSection() {
             директно онлайн.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col items-center gap-3 mb-12">
             <a
               href={`${theme.clicka.apiUrl}/${theme.clicka.salonSlug}`}
               className="bg-white text-purple-700 px-10 py-4 rounded-full font-semibold text-sm tracking-widest uppercase hover:bg-purple-50 transition-colors shadow-xl"
@@ -44,9 +44,10 @@ export default function BookingSection() {
             </a>
             <a
               href={`tel:${theme.salon.phone}`}
-              className="border-2 border-white text-white px-10 py-4 rounded-full font-semibold text-sm tracking-widest uppercase hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-xs tracking-wider uppercase transition-colors"
             >
-              Обади се
+              <span aria-hidden>📞</span>
+              <span>Обади се</span>
             </a>
           </div>
 

@@ -7,6 +7,7 @@ import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
 import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
+import CallButton from "@/components/CallButton";
 
 export default function Home() {
   return (
@@ -15,13 +16,14 @@ export default function Home() {
       <main>
         <Hero />
         <About />
-        <Services />
         <WhyUs />
+        <Services />
         <Gallery />
         <Testimonials />
         <BookingSection />
       </main>
       <Footer />
+      <CallButton />
     </>
   );
 }
