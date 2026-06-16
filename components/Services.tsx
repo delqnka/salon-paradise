@@ -1,48 +1,47 @@
 "use client";
 
 import { motion } from "motion/react";
-import theme from "@/theme.config";
+import { bookingUrl, formatDuration, formatPrice, type ClickaService } from "@/lib/clicka";
 
-const services = [
-  {
-    name: "Ламиниране на мигли и боядисване с ботокс терапия",
-    duration: "1 час",
-    price: "40 €",
+const FALLBACK_IMAGES: Record<string, string> = {
+  Мигли: "/ламин.jpg",
+  Промо: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&q=80",
+  Лице: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&q=80",
+  "Акне терапия": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80",
+  default: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80",
+};
+
+type DisplayService = {
+  name: string;
+  category: string;
+  price: string;
+  duration: string;
+  image: string;
+  sale: string | null;
+  originalPrice: string | null;
+};
+
+function imageFor(s: ClickaService): string {
+  if (s.images && s.images.length > 0 && s.images[0]) return s.images[0];
+  return FALLBACK_IMAGES[s.category || "default"] || FALLBACK_IMAGES.default;
+}
+
+function adaptServices(raw: ClickaService[] | undefined): DisplayService[] {
+  if (!raw || raw.length === 0) return [];
+  return raw.map((s) => ({
+    name: s.name,
+    category: s.category || "Услуга",
+    price: formatPrice(s.price),
+    duration: formatDuration(s.duration_min),
+    image: imageFor(s),
     sale: null,
     originalPrice: null,
-    category: "Мигли",
-    image: "/ламин.jpg",
-  },
-  {
-    name: "Комбо пакет Почистване на лице и хидратираща терапия",
-    duration: "2 часа",
-    price: "75 €",
-    sale: "17%",
-    originalPrice: "90 €",
-    category: "Лице",
-    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&q=80",
-  },
-  {
-    name: "Дълбоко почистване на лице и терапия за лечение на акне",
-    duration: "2 часа",
-    price: "76.50 €",
-    sale: "15%",
-    originalPrice: "90 €",
-    category: "Акне терапия",
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80",
-  },
-  {
-    name: "Промо пакет Ламиниране на вежди и мигли с боядисване и ботокс",
-    duration: "2 часа",
-    price: "72 €",
-    sale: "10%",
-    originalPrice: "80 €",
-    category: "Промо",
-    image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&q=80",
-  },
-];
+  }));
+}
 
-export default function Services() {
+export default function Services({ services: clickaServices }: { services?: ClickaService[] }) {
+  const services = adaptServices(clickaServices);
+  if (services.length === 0) return null;
   return (
     <section id="services" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -119,7 +118,7 @@ export default function Services() {
                 </div>
 
                 <a
-                  href={`${theme.clicka.apiUrl}/${theme.clicka.salonSlug}`}
+                  href={bookingUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 block text-center py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all border-2 border-purple-200 text-purple-600 hover:border-transparent hover:text-white"

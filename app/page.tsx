@@ -8,8 +8,13 @@ import Testimonials from "@/components/Testimonials";
 import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
 import CallButton from "@/components/CallButton";
+import { fetchSalon } from "@/lib/clicka";
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const salon = await fetchSalon();
+
   return (
     <>
       <Navbar />
@@ -17,7 +22,7 @@ export default function Home() {
         <Hero />
         <About />
         <WhyUs />
-        <Services />
+        <Services services={salon?.services} />
         <Gallery />
         <Testimonials />
         <BookingSection />
