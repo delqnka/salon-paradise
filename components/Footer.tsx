@@ -122,10 +122,11 @@ export default function Footer() {
             Намерете ни
           </h4>
           <div
-            className="relative rounded-2xl overflow-hidden"
+            className="relative rounded-2xl overflow-hidden bg-pink-100"
             style={{
               border: "2px solid #EC4899",
               boxShadow: "0 12px 36px -8px rgba(236,72,153,0.45)",
+              minHeight: 320,
             }}
           >
             <iframe
@@ -133,7 +134,7 @@ export default function Footer() {
               src="https://www.openstreetmap.org/export/embed.html?bbox=27.9097%2C43.2091%2C27.9297%2C43.2241&layer=mapnik"
               width="100%"
               height="320"
-              loading="lazy"
+              loading="eager"
               referrerPolicy="no-referrer-when-downgrade"
               style={{
                 border: 0,

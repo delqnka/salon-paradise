@@ -19,7 +19,7 @@ body {
   background-color: #FDFAFF;
   color: #2d1b69;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 img, video {

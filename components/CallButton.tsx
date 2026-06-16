@@ -14,9 +14,9 @@ export default function CallButton() {
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 1, type: "spring", stiffness: 200 }}
-      className="fixed right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full text-white"
+      className="fixed right-4 z-50 flex items-center justify-center w-14 h-14 rounded-full text-white"
       style={{
-        bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+        bottom: "calc(0.5rem + env(safe-area-inset-bottom, 0px))",
         background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
         boxShadow:
           "0 10px 25px -5px rgba(34,197,94,0.55), 0 4px 12px rgba(0,0,0,0.2)",
