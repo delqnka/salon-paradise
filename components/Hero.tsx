@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useBooking } from "./BookingProvider";
 
 export default function Hero() {
+  const booking = useBooking();
   return (
     <section
       id="home"
@@ -92,9 +94,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.45 }}
             className="flex flex-wrap gap-4"
           >
-            <a href="#booking" className="btn-primary text-sm">
+            <button type="button" onClick={() => booking.open()} className="btn-primary text-sm">
               Запишете час
-            </a>
+            </button>
             <a href="#services" className="btn-gradient-border">
               Нашите услуги
             </a>

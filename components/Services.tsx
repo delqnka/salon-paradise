@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { bookingUrl, formatDuration, formatPrice, type ClickaService } from "@/lib/clicka";
+import { formatDuration, formatPrice, type ClickaService } from "@/lib/clicka";
+import { useBooking } from "./BookingProvider";
 
 const FALLBACK_IMAGES: Record<string, string> = {
   Мигли: "/ламин.jpg",
@@ -41,6 +42,7 @@ function adaptServices(raw: ClickaService[] | undefined): DisplayService[] {
 
 export default function Services({ services: clickaServices }: { services?: ClickaService[] }) {
   const services = adaptServices(clickaServices);
+  const booking = useBooking();
   if (services.length === 0) return null;
   return (
     <section id="services" className="py-24 bg-white">
@@ -66,7 +68,9 @@ export default function Services({ services: clickaServices }: { services?: Clic
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((s, i) => (
+          {services.map((s, i) => {
+            const raw = clickaServices?.[i];
+            return (
             <motion.div
               key={s.name}
               initial={{ opacity: 0, y: 40 }}
@@ -117,11 +121,10 @@ export default function Services({ services: clickaServices }: { services?: Clic
                   </div>
                 </div>
 
-                <a
-                  href={bookingUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 block text-center py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all border-2 border-purple-200 text-purple-600 hover:border-transparent hover:text-white"
+                <button
+                  type="button"
+                  onClick={() => booking.open(raw)}
+                  className="mt-4 block w-full text-center py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all border-2 border-purple-200 text-purple-600 hover:border-transparent hover:text-white"
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #9B7FD4, #EC4899)";
                     (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -134,10 +137,11 @@ export default function Services({ services: clickaServices }: { services?: Clic
                   }}
                 >
                   Резервирай
-                </a>
+                </button>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

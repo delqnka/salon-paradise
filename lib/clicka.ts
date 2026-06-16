@@ -50,6 +50,91 @@ export function bookingUrl() {
   return `${CLICKA_API}/${SALON_SLUG}`;
 }
 
+export type OccupiedSlot = { time: string; duration: number };
+
+export async function fetchOccupiedSlots(date: string): Promise<OccupiedSlot[]> {
+  try {
+    const res = await fetch(
+      `${CLICKA_API}/api/bookings?public=1&date=${date}&slug=${SALON_SLUG}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as { occupied?: OccupiedSlot[] };
+    return data.occupied || [];
+  } catch {
+    return [];
+  }
+}
+
+export type CreateBookingInput = {
+  clientName: string;
+  clientPhone: string;
+  clientEmail: string;
+  serviceName: string;
+  servicePrice: number;
+  serviceDuration: number;
+  date: string;
+  time: string;
+  notes?: string;
+};
+
+export async function createBooking(
+  input: CreateBookingInput
+): Promise<{ ok: true; bookingId?: string } | { ok: false; error: string }> {
+  try {
+    const res = await fetch(`${CLICKA_API}/api/bookings?slug=${SALON_SLUG}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { ok: false, error: data.error || "Грешка при резервацията" };
+    }
+    return { ok: true, bookingId: data.bookingId };
+  } catch (e) {
+    return { ok: false, error: "Мрежова грешка. Опитайте отново." };
+  }
+}
+
+export function generateTimeSlots(
+  workingHours: ClickaSalon["working_hours"] | undefined,
+  date: string,
+  durationMin: number,
+  occupied: OccupiedSlot[],
+  intervalMin = 30
+): string[] {
+  if (!workingHours) return [];
+  const dayKeys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
+  const d = new Date(`${date}T12:00:00`);
+  const dayKey = dayKeys[d.getDay()];
+  const day = workingHours[dayKey];
+  if (!day || day.closed || !day.open || !day.close) return [];
+
+  const toMin = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+  const openMin = toMin(day.open);
+  const closeMin = toMin(day.close);
+
+  const occupiedRanges = occupied.map((o) => {
+    const start = toMin(o.time);
+    return { start, end: start + Math.max(5, o.duration) };
+  });
+
+  const slots: string[] = [];
+  for (let t = openMin; t + durationMin <= closeMin; t += intervalMin) {
+    const slotEnd = t + durationMin;
+    const overlaps = occupiedRanges.some((r) => t < r.end && slotEnd > r.start);
+    if (overlaps) continue;
+    const hh = String(Math.floor(t / 60)).padStart(2, "0");
+    const mm = String(t % 60).padStart(2, "0");
+    slots.push(`${hh}:${mm}`);
+  }
+  return slots;
+}
+
 export function formatPrice(price: number): string {
   return `${price.toFixed(price % 1 === 0 ? 0 : 2)} €`;
 }

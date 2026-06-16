@@ -2,8 +2,10 @@
 
 import { motion } from "motion/react";
 import theme from "@/theme.config";
+import { useBooking } from "./BookingProvider";
 
 export default function BookingSection() {
+  const booking = useBooking();
   return (
     <section
       id="booking"
@@ -36,12 +38,13 @@ export default function BookingSection() {
           </p>
 
           <div className="flex flex-col items-center gap-3 mb-12">
-            <a
-              href={`${theme.clicka.apiUrl}/${theme.clicka.salonSlug}`}
+            <button
+              type="button"
+              onClick={() => booking.open()}
               className="bg-white text-purple-700 px-10 py-4 rounded-full font-semibold text-sm tracking-widest uppercase hover:bg-purple-50 transition-colors shadow-xl"
             >
               Резервирай сега
-            </a>
+            </button>
             <a
               href={`tel:${theme.salon.phone}`}
               className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-xs tracking-wider uppercase transition-colors"

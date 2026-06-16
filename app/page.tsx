@@ -8,27 +8,29 @@ import Testimonials from "@/components/Testimonials";
 import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
 import CallButton from "@/components/CallButton";
+import { BookingProvider } from "@/components/BookingProvider";
 import { fetchSalon } from "@/lib/clicka";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const salon = await fetchSalon();
+  const services = salon?.services || [];
 
   return (
-    <>
+    <BookingProvider services={services} workingHours={salon?.working_hours}>
       <Navbar />
       <main>
         <Hero />
         <About />
         <WhyUs />
-        <Services services={salon?.services} />
+        <Services services={services} />
         <Gallery />
         <Testimonials />
         <BookingSection />
       </main>
       <Footer />
       <CallButton />
-    </>
+    </BookingProvider>
   );
 }
