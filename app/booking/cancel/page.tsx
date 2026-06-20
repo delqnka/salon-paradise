@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function BookingCancelPage() {
   return (
     <main className="min-h-screen bg-[#f8f1fb] text-[#2b2140] flex items-center justify-center px-6 py-16">
@@ -8,13 +10,13 @@ export default function BookingCancelPage() {
           Няма завършена резервация. Можете да се върнете обратно и да изберете нов час,
           когато сте готови.
         </p>
-        <a
+        <Link
           href="/#booking"
           className="inline-flex items-center justify-center rounded-full px-8 py-3 font-semibold text-white"
           style={{ background: "linear-gradient(135deg, #9B7FD4, #EC4899)" }}
         >
           Обратно към сайта
-        </a>
+        </Link>
       </div>
     </main>
   );
