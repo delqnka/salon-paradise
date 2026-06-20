@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { formatDuration, formatPrice, type ClickaService } from "@/lib/clicka";
 import { useBooking } from "./BookingProvider";
 

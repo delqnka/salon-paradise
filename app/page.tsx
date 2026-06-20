@@ -18,7 +18,7 @@ export default async function Home() {
   const services = salon?.services || [];
 
   return (
-    <BookingProvider services={services} workingHours={salon?.working_hours}>
+    <BookingProvider salon={salon}>
       <Navbar />
       <main>
         <Hero />

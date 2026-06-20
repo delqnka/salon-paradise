@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 
 const photos = [
   "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80",

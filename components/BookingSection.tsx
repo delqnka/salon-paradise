@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import theme from "@/theme.config";
 import { useBooking } from "./BookingProvider";
 
