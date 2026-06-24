@@ -1,7 +1,8 @@
 'use client';
-import { enrichServiceCategories, buildServiceCategoryTabs, I18nProvider, useT } from './chunk-Z5NWXJP7.js';
-import { lazy, forwardRef, useMemo, useImperativeHandle, Suspense, useState, useRef, useEffect, useCallback } from 'react';
-import { jsx } from 'react/jsx-runtime';
+import { enrichServiceCategories, buildServiceCategoryTabs, normalizeLocale, I18nProvider, useT } from './chunk-CANVXBHW.js';
+import { lazy, forwardRef, useMemo, createContext, useImperativeHandle, Suspense, useContext, useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { jsx, jsxs } from 'react/jsx-runtime';
 
 // ../../lib/salon-services.ts
 function randomHex(bytes) {
@@ -572,7 +573,7 @@ function useBookingFlow({
   };
 }
 var SalonBookingModal = lazy(
-  () => import('./SalonBookingModal-NLAEMRJE.js').then((m) => ({ default: m.SalonBookingModal }))
+  () => import('./SalonBookingModal-N4LE7UCQ.js').then((m) => ({ default: m.SalonBookingModal }))
 );
 function BookingWidgetInner({
   forwardedRef,
@@ -720,10 +721,12 @@ var BookingWidget = forwardRef(
       }
       return out;
     }, [serviceCatalog]);
-    const lang = typeof salon.language === "string" ? salon.language : "bg";
-    const resolvedLocale = localeProp ?? (lang === "en" ? "en-US" : "bg-BG");
+    const providerLocale = normalizeLocale(
+      localeProp ?? (typeof salon.language === "string" ? salon.language : "bg")
+    );
+    const resolvedLocale = localeProp ?? (providerLocale === "en" ? "en-US" : "bg-BG");
     const primaryColor = typeof salon.primary_color === "string" && salon.primary_color ? salon.primary_color : "#5B21B6";
-    return /* @__PURE__ */ jsx(I18nProvider, { locale: lang, children: /* @__PURE__ */ jsx(
+    return /* @__PURE__ */ jsx(I18nProvider, { locale: providerLocale, children: /* @__PURE__ */ jsx(
       BookingWidgetInner,
       {
         forwardedRef: ref,
@@ -749,7 +752,209 @@ var BookingWidget = forwardRef(
     ) });
   }
 );
+var BookingContext = createContext(null);
+function readGlobalString(key) {
+  if (typeof window === "undefined") return void 0;
+  const v = window[key];
+  return typeof v === "string" && v ? v : void 0;
+}
+function readMeta(name) {
+  if (typeof document === "undefined") return void 0;
+  return document.querySelector(`meta[name="${name}"]`)?.content || void 0;
+}
+function readEnv(key) {
+  try {
+    const p = typeof process !== "undefined" ? process : void 0;
+    const v = p?.env?.[key];
+    return typeof v === "string" && v ? v : void 0;
+  } catch {
+    return void 0;
+  }
+}
+function resolveSlug(prop) {
+  return prop || readGlobalString("__CLICKA_SALON_SLUG") || readMeta("clicka:salon") || readEnv("NEXT_PUBLIC_SALON_SLUG") || readEnv("NEXT_PUBLIC_CLICKA_SALON");
+}
+function resolveEngine(prop) {
+  return prop || readGlobalString("__CLICKA_ENGINE_URL") || readMeta("clicka:engine") || readEnv("NEXT_PUBLIC_CLICKA_ENGINE") || readEnv("NEXT_PUBLIC_CLICKA_API_URL") || // Canonical host (with www). The bare clicka.bg returns a 308 redirect
+  // which kills cross-origin fetches because the redirect response itself
+  // carries no CORS headers — browsers reject the whole chain.
+  "https://www.clicka.bg";
+}
+function resolveLocale(prop) {
+  if (prop) return prop;
+  if (typeof document !== "undefined") {
+    const htmlLang = document.documentElement.lang?.trim();
+    if (htmlLang) {
+      if (htmlLang === "bg") return "bg-BG";
+      if (htmlLang === "en") return "en-US";
+      return htmlLang;
+    }
+    const bodyLang = document.body?.dataset?.lang?.trim();
+    if (bodyLang) return bodyLang === "bg" ? "bg-BG" : "en-US";
+  }
+  if (typeof navigator !== "undefined" && navigator.language) {
+    return navigator.language;
+  }
+  return "bg-BG";
+}
+function defaultReturnUrl(flag) {
+  if (typeof window === "undefined") return void 0;
+  return `${location.origin}${location.pathname}?${flag}=1`;
+}
+function BookingProvider({
+  children,
+  salonSlug,
+  engineUrl,
+  locale,
+  successUrl,
+  cancelUrl,
+  accentGradient,
+  formatPrice,
+  onEvent,
+  basePath,
+  autoTriggers = true,
+  honorUrlParams = true
+}) {
+  const slug = useMemo(() => resolveSlug(salonSlug), [salonSlug]);
+  const resolvedEngineUrl = useMemo(() => resolveEngine(engineUrl), [engineUrl]);
+  const resolvedLocale = useMemo(() => resolveLocale(locale), [locale]);
+  const resolvedSuccessUrl = useMemo(
+    () => successUrl ?? defaultReturnUrl("booked"),
+    [successUrl]
+  );
+  const resolvedCancelUrl = useMemo(
+    () => cancelUrl ?? defaultReturnUrl("cancelled"),
+    [cancelUrl]
+  );
+  const widgetRef = useRef(null);
+  const pendingRef = useRef(void 0);
+  const urlAutoOpenedRef = useRef(false);
+  const [salon, setSalon] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    if (!slug) {
+      console.error(
+        '[@clicka/booking] BookingProvider has no salon slug. Pass `salonSlug` or set NEXT_PUBLIC_SALON_SLUG / <meta name="clicka:salon"> / window.__CLICKA_SALON_SLUG.'
+      );
+      return;
+    }
+    let cancelled = false;
+    const url = `${resolvedEngineUrl.replace(/\/$/, "")}/api/public/v1/salons/${encodeURIComponent(slug)}`;
+    fetch(url, { cache: "no-store" }).then((r) => {
+      if (!r.ok) throw new Error(`Salon fetch failed: HTTP ${r.status}`);
+      return r.json();
+    }).then((d) => {
+      if (cancelled) return;
+      if (!d.salon) throw new Error("Empty salon response");
+      setSalon(d.salon);
+      setError(null);
+    }).catch((e) => {
+      if (cancelled) return;
+      const err = e instanceof Error ? e : new Error(String(e));
+      console.error("[@clicka/booking] salon fetch failed:", err);
+      setError(err);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [resolvedEngineUrl, slug]);
+  const open = useCallback(
+    (service) => {
+      if (widgetRef.current && salon) {
+        widgetRef.current.open(service || void 0);
+      } else {
+        pendingRef.current = service ?? null;
+      }
+    },
+    [salon]
+  );
+  const close = useCallback(() => widgetRef.current?.close(), []);
+  useEffect(() => {
+    if (salon && widgetRef.current && pendingRef.current !== void 0) {
+      const s = pendingRef.current;
+      pendingRef.current = void 0;
+      widgetRef.current.open(s || void 0);
+    }
+  }, [salon]);
+  useEffect(() => {
+    if (!autoTriggers || typeof document === "undefined") return;
+    const SELECTOR = "[data-clicka-book],[data-book-service],[data-book]";
+    const handler = (ev) => {
+      const t = ev.target;
+      if (!t) return;
+      const trigger = t.closest(SELECTOR);
+      if (!trigger) return;
+      ev.preventDefault();
+      const raw = trigger.getAttribute("data-clicka-book") ?? trigger.getAttribute("data-book-service") ?? trigger.getAttribute("data-book") ?? "";
+      const service = raw && raw !== "true" ? raw : void 0;
+      open(service);
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [autoTriggers, open]);
+  useEffect(() => {
+    if (!honorUrlParams || !salon || urlAutoOpenedRef.current) return;
+    if (typeof location === "undefined") return;
+    const params = new URLSearchParams(location.search);
+    const initial = params.get("service");
+    if (initial || params.has("book")) {
+      urlAutoOpenedRef.current = true;
+      open(initial || void 0);
+    }
+  }, [honorUrlParams, salon, open]);
+  const value = useMemo(
+    () => ({ open, close, isReady: !!salon, error, salon }),
+    [open, close, salon, error]
+  );
+  const modalNode = salon && slug ? /* @__PURE__ */ jsx(
+    BookingWidget,
+    {
+      ref: widgetRef,
+      slug,
+      salon,
+      engineUrl: resolvedEngineUrl,
+      locale: resolvedLocale,
+      successUrl: resolvedSuccessUrl,
+      cancelUrl: resolvedCancelUrl,
+      accentGradient,
+      formatPrice,
+      onEvent,
+      basePath
+    }
+  ) : null;
+  return /* @__PURE__ */ jsxs(BookingContext.Provider, { value, children: [
+    children,
+    modalNode && typeof document !== "undefined" ? createPortal(modalNode, document.body) : modalNode
+  ] });
+}
+function useBooking() {
+  const ctx = useContext(BookingContext);
+  if (!ctx) {
+    throw new Error(
+      "[@clicka/booking] useBooking() must be called inside <BookingProvider>."
+    );
+  }
+  return ctx;
+}
+var BookingButton = forwardRef(
+  function BookingButton2({ service, onClick, type = "button", children, ...rest }, ref) {
+    const { open } = useBooking();
+    return /* @__PURE__ */ jsx(
+      "button",
+      {
+        ref,
+        type,
+        onClick: (e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented) open(service);
+        },
+        ...rest,
+        children
+      }
+    );
+  }
+);
 
-export { BookingWidget };
+export { BookingButton, BookingContext, BookingProvider, BookingWidget, useBooking };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

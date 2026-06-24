@@ -13,6 +13,28 @@ type BookingContextValue = {
 
 const BookingContext = createContext<BookingContextValue | null>(null);
 
+function resolveBookingLocale(salon: ClickaSalon | null): string {
+  const salonLanguage = typeof salon?.language === "string" ? salon.language.trim().toLowerCase() : "";
+  if (salonLanguage === "en" || salonLanguage.startsWith("en-")) return "en-US";
+
+  if (typeof document !== "undefined") {
+    const htmlLang = document.documentElement.lang?.trim().toLowerCase();
+    if (htmlLang === "en" || htmlLang.startsWith("en-")) return "en-US";
+    if (htmlLang === "bg" || htmlLang.startsWith("bg-")) return "bg-BG";
+
+    const bodyLang = document.body?.dataset?.lang?.trim().toLowerCase();
+    if (bodyLang === "en" || bodyLang.startsWith("en-")) return "en-US";
+    if (bodyLang === "bg" || bodyLang.startsWith("bg-")) return "bg-BG";
+  }
+
+  if (typeof navigator !== "undefined" && navigator.language) {
+    const browserLang = navigator.language.trim().toLowerCase();
+    if (browserLang === "en" || browserLang.startsWith("en-")) return "en-US";
+  }
+
+  return "bg-BG";
+}
+
 export function useBooking() {
   const ctx = useContext(BookingContext);
   if (!ctx) {
@@ -54,6 +76,7 @@ export function BookingProvider({
 
   const successUrl = siteOrigin ? `${siteOrigin}/booking/success` : undefined;
   const cancelUrl = siteOrigin ? `${siteOrigin}/booking/cancel` : undefined;
+  const bookingLocale = useMemo(() => resolveBookingLocale(salon), [salon]);
 
   return (
     <BookingContext.Provider value={contextValue}>
@@ -66,7 +89,7 @@ export function BookingProvider({
           engineUrl={engineUrl}
           successUrl={successUrl}
           cancelUrl={cancelUrl}
-          locale="bg-BG"
+          locale={bookingLocale}
           formatPrice={(amount) => `${amount.toFixed(amount % 1 === 0 ? 0 : 2)} лв.`}
         />
       ) : null}

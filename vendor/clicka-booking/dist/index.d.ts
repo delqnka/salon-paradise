@@ -1,4 +1,101 @@
-import * as react from 'react';
+import * as React from 'react';
+import React__default from 'react';
+
+type BookingContextValue = {
+    /**
+     * Open the booking modal. Pass a service id to pre-select it. If the salon
+     * record hasn't loaded yet, the call is queued and fired as soon as it does.
+     */
+    open: (service?: string) => void;
+    /** Close the booking modal. No-op if it isn't open. */
+    close: () => void;
+    /** True once the salon record is loaded and the modal is mountable. */
+    isReady: boolean;
+    /** Non-null if the salon fetch failed (network, 404, etc.). */
+    error: Error | null;
+    /** The raw salon record once loaded, or null while loading / on error. */
+    salon: Record<string, unknown> | null;
+};
+declare const BookingContext: React__default.Context<BookingContextValue | null>;
+type BookingProviderProps = {
+    children?: React__default.ReactNode;
+    /**
+     * Salon slug. If omitted, the provider tries (in order):
+     * 1. `window.__CLICKA_SALON_SLUG`
+     * 2. `<meta name="clicka:salon" content="...">`
+     * 3. `process.env.NEXT_PUBLIC_SALON_SLUG` (Next.js / Vite-replaced)
+     * 4. `process.env.NEXT_PUBLIC_CLICKA_SALON`
+     */
+    salonSlug?: string;
+    /**
+     * Engine origin. If omitted, the provider tries (in order):
+     * 1. `window.__CLICKA_ENGINE_URL`
+     * 2. `<meta name="clicka:engine" content="...">`
+     * 3. `process.env.NEXT_PUBLIC_CLICKA_ENGINE`
+     * 4. `process.env.NEXT_PUBLIC_CLICKA_API_URL`
+     * 5. Default: `https://clicka.bg`
+     */
+    engineUrl?: string;
+    /**
+     * BCP-47 locale. If omitted, the provider derives it from
+     * `<html lang>`, then `<body data-lang>`, then `navigator.language`,
+     * defaulting to `bg-BG`.
+     */
+    locale?: string;
+    /** Stripe success URL. Defaults to current page with `?booked=1`. */
+    successUrl?: string;
+    /** Stripe cancel URL. Defaults to current page with `?cancelled=1`. */
+    cancelUrl?: string;
+    /** CSS gradient for accent fills. */
+    accentGradient?: string;
+    /** Custom price formatter. */
+    formatPrice?: (amount: number) => string;
+    /** Analytics callback (replaces internal fbq/gtag). */
+    onEvent?: (name: 'booking_started' | 'booking_completed', payload?: {
+        serviceName?: string;
+        value?: number;
+        currency?: string;
+    }) => void;
+    /** Prefix for `/terms` and `/privacy` legal links. */
+    basePath?: string;
+    /**
+     * When true (default), the provider attaches a document-level click handler
+     * that opens the modal for any element matching `[data-clicka-book]`.
+     * The attribute value (when non-empty) is passed as the service id.
+     */
+    autoTriggers?: boolean;
+    /**
+     * When true (default), the provider opens the modal on mount if the URL
+     * contains `?service=<id>` or `?book=1`.
+     */
+    honorUrlParams?: boolean;
+};
+declare function BookingProvider({ children, salonSlug, engineUrl, locale, successUrl, cancelUrl, accentGradient, formatPrice, onEvent, basePath, autoTriggers, honorUrlParams, }: BookingProviderProps): React__default.JSX.Element;
+
+type BookingButtonProps = React__default.ButtonHTMLAttributes<HTMLButtonElement> & {
+    /** Pre-select this service id when opening the modal. */
+    service?: string;
+};
+/**
+ * Drop-in button that opens the booking modal. Must be used inside a
+ * `<BookingProvider>`. Accepts every native `<button>` prop so consumers
+ * keep their own classes, styles, ARIA, etc.
+ *
+ * @example
+ *   <BookingButton>Reserve</BookingButton>
+ *   <BookingButton service="balayage" className="btn btn_solid">Book balayage</BookingButton>
+ */
+declare const BookingButton: React__default.ForwardRefExoticComponent<React__default.ButtonHTMLAttributes<HTMLButtonElement> & {
+    /** Pre-select this service id when opening the modal. */
+    service?: string;
+} & React__default.RefAttributes<HTMLButtonElement>>;
+
+/**
+ * Access the booking modal from anywhere inside a `<BookingProvider>`.
+ *
+ * @throws if called outside a `<BookingProvider>` tree.
+ */
+declare function useBooking(): BookingContextValue;
 
 type OpeningDayRecord = Record<string, {
     open: string;
@@ -90,6 +187,6 @@ type BookingWidgetProps = {
     }) => void;
 };
 
-declare const BookingWidget: react.ForwardRefExoticComponent<BookingWidgetProps & react.RefAttributes<BookingWidgetHandle>>;
+declare const BookingWidget: React.ForwardRefExoticComponent<BookingWidgetProps & React.RefAttributes<BookingWidgetHandle>>;
 
-export { type BookingBlock, type BookingServiceItem, type BookingSuccessDetails, BookingWidget, type BookingWidgetHandle, type BookingWidgetProps, type OpeningDayRecord, type PublicStaffMember };
+export { type BookingBlock, BookingButton, type BookingButtonProps, BookingContext, type BookingContextValue, BookingProvider, type BookingProviderProps, type BookingServiceItem, type BookingSuccessDetails, BookingWidget, type BookingWidgetHandle, type BookingWidgetProps, type OpeningDayRecord, type PublicStaffMember, useBooking };
