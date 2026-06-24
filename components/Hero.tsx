@@ -94,9 +94,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.45 }}
             className="flex flex-wrap gap-4"
           >
-            <button type="button" onClick={() => booking.open()} className="btn-primary text-sm">
+            <a href="#services" className="btn-primary text-sm">
               Запишете час
-            </button>
+            </a>
             <a href="#services" className="btn-gradient-border">
               Нашите услуги
             </a>
